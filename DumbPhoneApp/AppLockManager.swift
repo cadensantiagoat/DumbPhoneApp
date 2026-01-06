@@ -56,13 +56,16 @@ class AppLockManager: ObservableObject {
     }
     
     func canOpenApp(_ app: LockedApp) -> Bool {
+        // Get the current state from lockedApps if available
+        let currentApp = lockedApps.first { $0.id == app.id } ?? app
+        
         // Check if app is bypassed
-        if let bypassUntil = app.bypassUntil, bypassUntil > Date() {
+        if let bypassUntil = currentApp.bypassUntil, bypassUntil > Date() {
             return true
         }
         
         // Check if steps requirement is met
-        return healthKitManager.todaySteps >= app.requiredSteps
+        return healthKitManager.todaySteps >= currentApp.requiredSteps
     }
     
     func requestBypass(for app: LockedApp) {
@@ -77,6 +80,13 @@ class AppLockManager: ObservableObject {
             updatedApp.bypassUntil = Date().addingTimeInterval(duration)
             updatedApp.isLocked = false
             lockedApps[index] = updatedApp
+        } else {
+            // If app not in lockedApps yet, add it with bypass
+            var newApp = app
+            newApp.isBypassed = true
+            newApp.bypassUntil = Date().addingTimeInterval(duration)
+            newApp.isLocked = false
+            lockedApps.append(newApp)
         }
     }
     
@@ -91,13 +101,18 @@ class AppLockManager: ObservableObject {
             settings.lockedApps[index] = updatedApp
             settings.saveSettings()
         }
+        // Sync back to ensure UI updates
+        syncWithSettings(settings)
     }
     
     func attemptToOpenApp(_ app: LockedApp) {
-        if canOpenApp(app) {
-            openApp(app: app)
+        // Get the current state from lock manager
+        let currentApp = lockedApps.first { $0.id == app.id } ?? app
+        
+        if canOpenApp(currentApp) {
+            openApp(app: currentApp)
         } else {
-            requestBypass(for: app)
+            requestBypass(for: currentApp)
         }
     }
     
@@ -110,7 +125,10 @@ class AppLockManager: ObservableObject {
         
         // Check if the URL scheme can be opened
         if UIApplication.shared.canOpenURL(url) {
-            UIApplication.shared.open(url, options: [:]) { success in
+            // Note: iOS will show a confirmation prompt the first time for each URL scheme.
+            // This is a system security feature and cannot be bypassed.
+            // After the first confirmation, iOS remembers the choice and won't prompt again.
+            UIApplication.shared.open(url, options: [.universalLinksOnly: false]) { success in
                 if !success {
                     DispatchQueue.main.async {
                         self.showCannotOpenAlert(for: app.name)

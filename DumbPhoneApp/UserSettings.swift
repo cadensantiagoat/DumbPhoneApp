@@ -14,11 +14,13 @@ class UserSettings: ObservableObject {
     @Published var lockedApps: [LockedApp] = []
     @Published var dailyStepGoal: Int = 5000
     @Published var isDumbPhoneModeEnabled: Bool = true
+    @Published var showFirstTimePromptInfo: Bool = true
     
     private let userDefaults = UserDefaults.standard
     private let appsKey = "lockedApps"
     private let stepGoalKey = "dailyStepGoal"
     private let dumbPhoneModeKey = "isDumbPhoneModeEnabled"
+    private let showPromptInfoKey = "showFirstTimePromptInfo"
     
     private init() {
         loadSettings()
@@ -38,6 +40,12 @@ class UserSettings: ObservableObject {
             dailyStepGoal = 5000
         }
         isDumbPhoneModeEnabled = userDefaults.bool(forKey: dumbPhoneModeKey)
+        // Only show prompt info if it hasn't been set yet (defaults to true for new users)
+        if userDefaults.object(forKey: showPromptInfoKey) == nil {
+            showFirstTimePromptInfo = true
+        } else {
+            showFirstTimePromptInfo = userDefaults.bool(forKey: showPromptInfoKey)
+        }
     }
     
     func saveSettings() {
@@ -46,6 +54,7 @@ class UserSettings: ObservableObject {
         }
         userDefaults.set(dailyStepGoal, forKey: stepGoalKey)
         userDefaults.set(isDumbPhoneModeEnabled, forKey: dumbPhoneModeKey)
+        userDefaults.set(showFirstTimePromptInfo, forKey: showPromptInfoKey)
     }
     
     func addApp(_ app: LockedApp) {

@@ -45,6 +45,29 @@ struct ContentView: View {
                     .padding(.horizontal, 20)
                     .padding(.top, 10)
                     
+                    // Info about first-time prompt
+                    if userSettings.showFirstTimePromptInfo {
+                        HStack(spacing: 4) {
+                            Image(systemName: "info.circle")
+                                .font(.system(size: 10))
+                                .foregroundColor(.gray)
+                            Text("First-time app opens require confirmation")
+                                .font(.system(size: 10, weight: .light))
+                                .foregroundColor(.gray)
+                            Spacer()
+                            Button(action: {
+                                userSettings.showFirstTimePromptInfo = false
+                                userSettings.saveSettings()
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .font(.system(size: 10))
+                                    .foregroundColor(.gray.opacity(0.7))
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.top, -5)
+                    }
+                    
                     Text("\(healthKitManager.todaySteps)")
                         .font(.system(size: 48, weight: .thin, design: .rounded))
                         .foregroundColor(.white)
@@ -68,7 +91,8 @@ struct ContentView: View {
                 // App grid
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: 25) {
-                        ForEach(userSettings.lockedApps) { app in
+                        // Use apps from lock manager to get latest bypass state
+                        ForEach(appLockManager.lockedApps.isEmpty ? userSettings.lockedApps : appLockManager.lockedApps) { app in
                             AppIconView(app: app, size: 70)
                                 .environmentObject(appLockManager)
                                 .environmentObject(healthKitManager)

@@ -13,13 +13,33 @@ struct AppIconView: View {
     @EnvironmentObject var appLockManager: AppLockManager
     @EnvironmentObject var healthKitManager: HealthKitManager
     
+    // Get the current state of this app from the lock manager
+    var currentApp: LockedApp? {
+        appLockManager.lockedApps.first { $0.id == app.id } ?? app
+    }
+    
     var isUnlocked: Bool {
-        healthKitManager.todaySteps >= app.requiredSteps || app.isBypassed
+        guard let currentApp = currentApp else {
+            return healthKitManager.todaySteps >= app.requiredSteps || app.isBypassed
+        }
+        // Check if bypassed or steps requirement met
+        if let bypassUntil = currentApp.bypassUntil, bypassUntil > Date() {
+            return true
+        }
+        return healthKitManager.todaySteps >= currentApp.requiredSteps
     }
     
     var progress: Double {
-        guard app.requiredSteps > 0 else { return 1.0 }
-        return min(Double(healthKitManager.todaySteps) / Double(app.requiredSteps), 1.0)
+        guard let currentApp = currentApp else {
+            guard app.requiredSteps > 0 else { return 1.0 }
+            return min(Double(healthKitManager.todaySteps) / Double(app.requiredSteps), 1.0)
+        }
+        guard currentApp.requiredSteps > 0 else { return 1.0 }
+        return min(Double(healthKitManager.todaySteps) / Double(currentApp.requiredSteps), 1.0)
+    }
+    
+    var displayApp: LockedApp {
+        currentApp ?? app
     }
     
     var body: some View {
@@ -44,18 +64,18 @@ struct AppIconView: View {
                 }
                 
                 // Icon content
-                if app.iconSymbol.count == 1 && app.iconSymbol.unicodeScalars.first?.properties.isEmoji == true {
+                if displayApp.iconSymbol.count == 1 && displayApp.iconSymbol.unicodeScalars.first?.properties.isEmoji == true {
                     // Emoji icon
-                    Text(app.iconSymbol)
+                    Text(displayApp.iconSymbol)
                         .font(.system(size: size * 0.4))
-                } else if app.iconSymbol.count <= 3 {
+                } else if displayApp.iconSymbol.count <= 3 {
                     // Text icon (like "f", "N", "a", etc.)
-                    Text(app.iconSymbol)
+                    Text(displayApp.iconSymbol)
                         .font(.system(size: size * 0.35, weight: .medium, design: .default))
                         .foregroundColor(.white)
                 } else {
                     // Longer text (like "ebay", "PayPal")
-                    Text(app.iconSymbol)
+                    Text(displayApp.iconSymbol)
                         .font(.system(size: size * 0.2, weight: .medium, design: .default))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
@@ -73,7 +93,7 @@ struct AppIconView: View {
             }
             
             // App name
-            Text(app.name)
+            Text(displayApp.name)
                 .font(.system(size: 11, weight: .regular))
                 .foregroundColor(.white)
                 .lineLimit(1)
@@ -81,13 +101,18 @@ struct AppIconView: View {
             
             // Steps progress
             if !isUnlocked {
-                Text("\(healthKitManager.todaySteps)/\(app.requiredSteps)")
+                Text("\(healthKitManager.todaySteps)/\(displayApp.requiredSteps)")
                     .font(.system(size: 9, weight: .light))
                     .foregroundColor(.gray)
             }
         }
         .onTapGesture {
-            appLockManager.attemptToOpenApp(app)
+            // Use the current app state from lock manager
+            if let currentApp = currentApp {
+                appLockManager.attemptToOpenApp(currentApp)
+            } else {
+                appLockManager.attemptToOpenApp(app)
+            }
         }
     }
 }
