@@ -14,7 +14,9 @@ class AppLockManager: ObservableObject {
     
     @Published var lockedApps: [LockedApp] = []
     @Published var showingBypassAlert: Bool = false
+    @Published var showingCannotOpenAlert: Bool = false
     @Published var currentBypassApp: LockedApp?
+    @Published var cannotOpenAppName: String = ""
     
     private var cancellables = Set<AnyCancellable>()
     private let healthKitManager = HealthKitManager.shared
@@ -93,28 +95,37 @@ class AppLockManager: ObservableObject {
     
     func attemptToOpenApp(_ app: LockedApp) {
         if canOpenApp(app) {
-            openApp(bundleIdentifier: app.bundleIdentifier)
+            openApp(app: app)
         } else {
             requestBypass(for: app)
         }
     }
     
-    private func openApp(bundleIdentifier: String) {
-        // Note: iOS doesn't allow directly opening other apps from a third-party app
-        // This is a limitation of iOS security. In a real implementation, you would:
-        // 1. Use URL schemes if the app supports them
-        // 2. Show instructions to the user
-        // 3. Use Screen Time API (requires special entitlements)
-        
-        if let url = URL(string: "\(bundleIdentifier)://") {
-            if UIApplication.shared.canOpenURL(url) {
-                UIApplication.shared.open(url)
-            } else {
-                // Fallback: Show alert that app can't be opened directly
-                print("Cannot open app with bundle identifier: \(bundleIdentifier)")
-                // In a real app, you'd show an alert here
-            }
+    private func openApp(app: LockedApp) {
+        // Use URL scheme to open the app
+        guard let url = URL(string: app.urlScheme) else {
+            showCannotOpenAlert(for: app.name)
+            return
         }
+        
+        // Check if the URL scheme can be opened
+        if UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url, options: [:]) { success in
+                if !success {
+                    DispatchQueue.main.async {
+                        self.showCannotOpenAlert(for: app.name)
+                    }
+                }
+            }
+        } else {
+            // App is not installed or URL scheme doesn't work
+            showCannotOpenAlert(for: app.name)
+        }
+    }
+    
+    private func showCannotOpenAlert(for appName: String) {
+        cannotOpenAppName = appName
+        showingCannotOpenAlert = true
     }
     
     func syncWithSettings(_ settings: UserSettings) {

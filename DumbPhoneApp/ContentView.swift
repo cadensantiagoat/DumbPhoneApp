@@ -109,6 +109,11 @@ struct ContentView: View {
                 Text("\(app.name) requires \(app.requiredSteps) steps. You have \(healthKitManager.todaySteps) steps. Would you like to bypass this lock?")
             }
         }
+        .alert("Cannot Open App", isPresented: $appLockManager.showingCannotOpenAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Unable to open \(appLockManager.cannotOpenAppName). The app may not be installed, or its URL scheme may not be configured correctly. You can manually open the app from your home screen.")
+        }
         .onAppear {
             appLockManager.syncWithSettings(userSettings)
             healthKitManager.requestAuthorization()

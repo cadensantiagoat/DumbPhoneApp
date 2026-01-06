@@ -6,6 +6,27 @@
 	<string>This app needs access to your step count to unlock apps.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>This app needs access to your step count to unlock apps.</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>instagram</string>
+		<string>fb</string>
+		<string>twitter</string>
+		<string>tiktok</string>
+		<string>youtube</string>
+		<string>nflx</string>
+		<string>reddit</string>
+		<string>snapchat</string>
+		<string>discord</string>
+		<string>googlegmail</string>
+		<string>googlechrome</string>
+		<string>x-web-search</string>
+		<string>amazon</string>
+		<string>ebay</string>
+		<string>paypal</string>
+		<string>spotify</string>
+		<string>music</string>
+		<string>gamecenter</string>
+	</array>
 </dict>
 </plist>
 

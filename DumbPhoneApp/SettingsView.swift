@@ -143,6 +143,7 @@ struct AppDetailView: View {
     @EnvironmentObject var userSettings: UserSettings
     @State private var appName: String
     @State private var appIcon: String
+    @State private var urlScheme: String
     @State private var requiredSteps: Int
     @Environment(\.dismiss) var dismiss
     
@@ -150,6 +151,7 @@ struct AppDetailView: View {
         self.app = app
         _appName = State(initialValue: app.name)
         _appIcon = State(initialValue: app.iconSymbol)
+        _urlScheme = State(initialValue: app.urlScheme)
         _requiredSteps = State(initialValue: app.requiredSteps)
     }
     
@@ -165,6 +167,10 @@ struct AppDetailView: View {
                         .listRowBackground(Color.gray.opacity(0.1))
                     
                     TextField("Icon Symbol", text: $appIcon)
+                        .foregroundColor(.white)
+                        .listRowBackground(Color.gray.opacity(0.1))
+                    
+                    TextField("URL Scheme (e.g., instagram://)", text: $urlScheme)
                         .foregroundColor(.white)
                         .listRowBackground(Color.gray.opacity(0.1))
                     
@@ -187,6 +193,7 @@ struct AppDetailView: View {
                             var updatedApp = userSettings.lockedApps[index]
                             updatedApp.name = appName
                             updatedApp.iconSymbol = appIcon
+                            updatedApp.urlScheme = urlScheme.isEmpty ? updatedApp.urlScheme : urlScheme
                             updatedApp.requiredSteps = requiredSteps
                             userSettings.updateApp(updatedApp)
                         }
@@ -215,6 +222,7 @@ struct AddAppView: View {
     @Environment(\.dismiss) var dismiss
     @State private var appName = ""
     @State private var appIcon = ""
+    @State private var urlScheme = ""
     @State private var requiredSteps = 1000
     @State private var bundleIdentifier = ""
     
@@ -231,6 +239,10 @@ struct AddAppView: View {
                             .listRowBackground(Color.gray.opacity(0.1))
                         
                         TextField("Icon Symbol (emoji or text)", text: $appIcon)
+                            .foregroundColor(.white)
+                            .listRowBackground(Color.gray.opacity(0.1))
+                        
+                        TextField("URL Scheme (e.g., instagram://)", text: $urlScheme)
                             .foregroundColor(.white)
                             .listRowBackground(Color.gray.opacity(0.1))
                         
@@ -267,6 +279,7 @@ struct AddAppView: View {
                             name: appName.isEmpty ? "New App" : appName,
                             iconSymbol: appIcon.isEmpty ? "📱" : appIcon,
                             bundleIdentifier: bundleIdentifier.isEmpty ? "com.example.app" : bundleIdentifier,
+                            urlScheme: urlScheme,
                             requiredSteps: requiredSteps
                         )
                         userSettings.addApp(newApp)
