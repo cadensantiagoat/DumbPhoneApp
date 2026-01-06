@@ -8,24 +8,113 @@
 	<string>This app needs access to your step count to unlock apps.</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
+		<!-- Social Media -->
 		<string>instagram</string>
 		<string>fb</string>
 		<string>twitter</string>
 		<string>tiktok</string>
+		<string>snapchat</string>
+		<string>reddit</string>
+		<string>discord</string>
+		<string>linkedin</string>
+		<string>pinterest</string>
+		<string>whatsapp</string>
+		<string>tg</string>
+		<string>sgnl</string>
+		<string>weixin</string>
+		<!-- Video & Entertainment -->
 		<string>youtube</string>
 		<string>nflx</string>
-		<string>reddit</string>
-		<string>snapchat</string>
-		<string>discord</string>
-		<string>googlegmail</string>
-		<string>googlechrome</string>
-		<string>x-web-search</string>
-		<string>amazon</string>
-		<string>ebay</string>
-		<string>paypal</string>
+		<string>hulu</string>
+		<string>disneyplus</string>
+		<string>hbomax</string>
+		<string>twitch</string>
+		<string>vimeo</string>
+		<!-- Music & Audio -->
 		<string>spotify</string>
 		<string>music</string>
+		<string>pandora</string>
+		<string>soundcloud</string>
+		<string>audible</string>
+		<string>podcasts</string>
+		<!-- Shopping -->
+		<string>amazon</string>
+		<string>ebay</string>
+		<string>etsy</string>
+		<string>target</string>
+		<string>walmart</string>
+		<string>bestbuy</string>
+		<!-- Payment & Finance -->
+		<string>paypal</string>
+		<string>venmo</string>
+		<string>squarecash</string>
+		<string>zelle</string>
+		<string>robinhood</string>
+		<string>chase</string>
+		<string>bofa</string>
+		<!-- Browsers -->
+		<string>googlechrome</string>
+		<string>x-web-search</string>
+		<string>firefox</string>
+		<string>microsoft-edge-https</string>
+		<string>brave</string>
+		<string>ddgQuickLink</string>
+		<!-- Email -->
+		<string>googlegmail</string>
+		<string>ms-outlook</string>
+		<string>ymail</string>
+		<string>message</string>
+		<!-- Food & Delivery -->
+		<string>uber-eats</string>
+		<string>doordash</string>
+		<string>grubhub</string>
+		<string>postmates</string>
+		<string>starbucks</string>
+		<!-- Travel -->
+		<string>uber</string>
+		<string>lyft</string>
+		<string>airbnb</string>
+		<string>booking</string>
+		<string>expedia</string>
+		<string>comgooglemaps</string>
+		<string>waze</string>
+		<string>maps</string>
+		<!-- Productivity -->
+		<string>slack</string>
+		<string>msteams</string>
+		<string>zoomus</string>
+		<string>notion</string>
+		<string>evernote</string>
+		<string>mobilenotes</string>
+		<string>x-apple-reminder</string>
+		<string>calshow</string>
+		<!-- Games -->
 		<string>gamecenter</string>
+		<!-- News & Reading -->
+		<string>applenews</string>
+		<string>kindle</string>
+		<string>medium</string>
+		<!-- Fitness & Health -->
+		<string>strava</string>
+		<string>mfp</string>
+		<string>nikeplus</string>
+		<!-- Photo & Video -->
+		<string>photos-redirect</string>
+		<string>camera</string>
+		<string>vsco</string>
+		<!-- Default iOS Apps -->
+		<string>sms</string>
+		<string>tel</string>
+		<string>facetime</string>
+		<string>addressbook</string>
+		<string>app-settings</string>
+		<string>itms-apps</string>
+		<string>shoebox</string>
+		<string>x-apple-health</string>
+		<string>weather</string>
+		<string>clock-worldclock</string>
+		<string>calculator</string>
+		<string>shareddocuments</string>
 	</array>
 </dict>
 </plist>

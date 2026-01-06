@@ -64,8 +64,12 @@ struct AppIconView: View {
                         .rotationEffect(.degrees(-90))
                 }
                 
-                // Icon content
-                if displayApp.iconSymbol.count == 1 && displayApp.iconSymbol.unicodeScalars.first?.properties.isEmoji == true {
+                // Icon content - Try SF Symbol first, then fallback to iconSymbol
+                if let sfSymbol = AppIconHelper.sfSymbolForApp(displayApp.name) {
+                    Image(systemName: sfSymbol)
+                        .font(.system(size: size * 0.4, weight: .medium))
+                        .foregroundColor(.white)
+                } else if displayApp.iconSymbol.count == 1 && displayApp.iconSymbol.unicodeScalars.first?.properties.isEmoji == true {
                     // Emoji icon
                     Text(displayApp.iconSymbol)
                         .font(.system(size: size * 0.4))

@@ -19,6 +19,16 @@ struct ContentView: View {
     ]
     
     var body: some View {
+        // Show onboarding if not completed
+        if !userSettings.hasCompletedOnboarding {
+            OnboardingView()
+                .environmentObject(userSettings)
+        } else {
+            mainContentView
+        }
+    }
+    
+    private var mainContentView: some View {
         ZStack {
             // Black background
             Color.black
@@ -90,16 +100,32 @@ struct ContentView: View {
                 
                 // App grid
                 ScrollView {
-                    LazyVGrid(columns: columns, spacing: 25) {
-                        // Use apps from lock manager to get latest bypass state
-                        ForEach(appLockManager.lockedApps.isEmpty ? userSettings.lockedApps : appLockManager.lockedApps) { app in
-                            AppIconView(app: app, size: 70)
-                                .environmentObject(appLockManager)
-                                .environmentObject(healthKitManager)
+                    if (appLockManager.lockedApps.isEmpty ? userSettings.lockedApps : appLockManager.lockedApps).isEmpty {
+                        // Empty state
+                        VStack(spacing: 20) {
+                            Image(systemName: "square.grid.2x2")
+                                .font(.system(size: 60))
+                                .foregroundColor(.gray.opacity(0.5))
+                            Text("No apps added yet")
+                                .font(.system(size: 18, weight: .light))
+                                .foregroundColor(.gray)
+                            Text("Tap the settings icon to add apps")
+                                .font(.system(size: 14, weight: .light))
+                                .foregroundColor(.gray.opacity(0.7))
                         }
+                        .padding(.top, 100)
+                    } else {
+                        LazyVGrid(columns: columns, spacing: 25) {
+                            // Use apps from lock manager to get latest bypass state
+                            ForEach(appLockManager.lockedApps.isEmpty ? userSettings.lockedApps : appLockManager.lockedApps) { app in
+                                AppIconView(app: app, size: 70)
+                                    .environmentObject(appLockManager)
+                                    .environmentObject(healthKitManager)
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 30)
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 30)
                 }
             }
         }
@@ -144,6 +170,12 @@ struct ContentView: View {
         }
         .onChange(of: userSettings.lockedApps) { _ in
             appLockManager.syncWithSettings(userSettings)
+        }
+        .onChange(of: userSettings.hasCompletedOnboarding) { _ in
+            // When onboarding completes, sync apps to lock manager
+            if userSettings.hasCompletedOnboarding {
+                appLockManager.syncWithSettings(userSettings)
+            }
         }
     }
 }

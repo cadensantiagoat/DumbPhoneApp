@@ -15,19 +15,18 @@ class UserSettings: ObservableObject {
     @Published var dailyStepGoal: Int = 5000
     @Published var isDumbPhoneModeEnabled: Bool = true
     @Published var showFirstTimePromptInfo: Bool = true
+    @Published var hasCompletedOnboarding: Bool = false
     
     private let userDefaults = UserDefaults.standard
     private let appsKey = "lockedApps"
     private let stepGoalKey = "dailyStepGoal"
     private let dumbPhoneModeKey = "isDumbPhoneModeEnabled"
     private let showPromptInfoKey = "showFirstTimePromptInfo"
+    private let hasCompletedOnboardingKey = "hasCompletedOnboarding"
     
     private init() {
         loadSettings()
-        if lockedApps.isEmpty {
-            lockedApps = LockedApp.defaultApps
-            saveSettings()
-        }
+        // Don't auto-populate apps anymore - user will select during onboarding
     }
     
     func loadSettings() {
@@ -46,6 +45,7 @@ class UserSettings: ObservableObject {
         } else {
             showFirstTimePromptInfo = userDefaults.bool(forKey: showPromptInfoKey)
         }
+        hasCompletedOnboarding = userDefaults.bool(forKey: hasCompletedOnboardingKey)
     }
     
     func saveSettings() {
@@ -55,6 +55,7 @@ class UserSettings: ObservableObject {
         userDefaults.set(dailyStepGoal, forKey: stepGoalKey)
         userDefaults.set(isDumbPhoneModeEnabled, forKey: dumbPhoneModeKey)
         userDefaults.set(showFirstTimePromptInfo, forKey: showPromptInfoKey)
+        userDefaults.set(hasCompletedOnboarding, forKey: hasCompletedOnboardingKey)
     }
     
     func addApp(_ app: LockedApp) {
@@ -72,6 +73,12 @@ class UserSettings: ObservableObject {
             lockedApps[index] = app
             saveSettings()
         }
+    }
+    
+    func completeOnboarding(selectedApps: [LockedApp]) {
+        lockedApps = selectedApps
+        hasCompletedOnboarding = true
+        saveSettings()
     }
 }
 
