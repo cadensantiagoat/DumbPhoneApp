@@ -12,6 +12,7 @@ struct AppIconView: View {
     let size: CGFloat
     @EnvironmentObject var appLockManager: AppLockManager
     @EnvironmentObject var healthKitManager: HealthKitManager
+    @EnvironmentObject var userSettings: UserSettings
     
     // Get the current state of this app from the lock manager
     var currentApp: LockedApp? {
@@ -112,6 +113,19 @@ struct AppIconView: View {
                 appLockManager.attemptToOpenApp(currentApp)
             } else {
                 appLockManager.attemptToOpenApp(app)
+            }
+        }
+        .contextMenu {
+            if isUnlocked {
+                Button(action: {
+                    if let currentApp = currentApp {
+                        appLockManager.reLockApp(currentApp, settings: userSettings)
+                    } else {
+                        appLockManager.reLockApp(app, settings: userSettings)
+                    }
+                }) {
+                    Label("Lock App", systemImage: "lock.fill")
+                }
             }
         }
     }

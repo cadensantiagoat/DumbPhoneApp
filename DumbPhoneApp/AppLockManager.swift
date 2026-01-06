@@ -105,6 +105,30 @@ class AppLockManager: ObservableObject {
         syncWithSettings(settings)
     }
     
+    func reLockApp(_ app: LockedApp, settings: UserSettings) {
+        // Remove bypass and lock the app
+        if let index = lockedApps.firstIndex(where: { $0.id == app.id }) {
+            var updatedApp = lockedApps[index]
+            updatedApp.isBypassed = false
+            updatedApp.bypassUntil = nil
+            updatedApp.isLocked = true
+            lockedApps[index] = updatedApp
+        }
+        
+        // Also update in settings to persist
+        if let index = settings.lockedApps.firstIndex(where: { $0.id == app.id }) {
+            var updatedApp = settings.lockedApps[index]
+            updatedApp.isBypassed = false
+            updatedApp.bypassUntil = nil
+            updatedApp.isLocked = true
+            settings.lockedApps[index] = updatedApp
+            settings.saveSettings()
+        }
+        
+        // Sync back to ensure UI updates
+        syncWithSettings(settings)
+    }
+    
     func attemptToOpenApp(_ app: LockedApp) {
         // Get the current state from lock manager
         let currentApp = lockedApps.first { $0.id == app.id } ?? app

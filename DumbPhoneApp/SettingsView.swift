@@ -63,7 +63,8 @@ struct SettingsView: View {
                     Section(header: Text("Locked Apps").foregroundColor(.white)) {
                         ForEach(userSettings.lockedApps) { app in
                             NavigationLink(destination: AppDetailView(app: app)
-                                .environmentObject(userSettings)) {
+                                .environmentObject(userSettings)
+                                .environmentObject(appLockManager)) {
                                 HStack {
                                     // Mini icon preview
                                     ZStack {
@@ -141,6 +142,7 @@ struct SettingsView: View {
 struct AppDetailView: View {
     let app: LockedApp
     @EnvironmentObject var userSettings: UserSettings
+    @EnvironmentObject var appLockManager: AppLockManager
     @State private var appName: String
     @State private var appIcon: String
     @State private var urlScheme: String
@@ -188,6 +190,22 @@ struct AppDetailView: View {
                 }
                 
                 Section {
+                    // Show re-lock option if app is currently unlocked
+                    if let currentApp = userSettings.lockedApps.first(where: { $0.id == app.id }),
+                       (!currentApp.isLocked || currentApp.isBypassed) {
+                        Button(action: {
+                            appLockManager.reLockApp(app, settings: userSettings)
+                            dismiss()
+                        }) {
+                            HStack {
+                                Image(systemName: "lock.fill")
+                                Text("Re-lock App")
+                            }
+                        }
+                        .foregroundColor(.orange)
+                        .listRowBackground(Color.gray.opacity(0.1))
+                    }
+                    
                     Button("Save Changes") {
                         if let index = userSettings.lockedApps.firstIndex(where: { $0.id == app.id }) {
                             var updatedApp = userSettings.lockedApps[index]
